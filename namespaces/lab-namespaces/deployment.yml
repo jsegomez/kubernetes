@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: namespace-lab
+  namespace: development
+  labels:
+    app: namespace-lab
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: namespace-lab
+  template:
+    metadata:
+      labels:
+        app: namespace-lab
+    spec:
+      containers:
+        - name: namespace-lab
+          image: namespace-lab:1.0.0
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "250m"
+              memory: "256Mi"

@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: limit-request
+spec:
+  containers:
+    - name: nginx
+      image: nginx:stable-alpine3.24-perl
+      command: ["/bin/sh", "-c"]
+      args:
+        - |
+          # Satura la CPU con procesos en bucle infinito (supera el limit de cpu)
+          for i in 1 2 3 4; do
+            while true; do :; done &
+          done
+          # Reserva memoria en bloques hasta exceder el limit (dispara OOMKilled)
+          perl -e '
+            my @blocks;
+            while (1) {
+              push @blocks, ("x" x 10485760);
+              print "Memoria reservada: " . (scalar(@blocks) * 10) . " MB\n";
+              sleep 1;
+            }
+          '
+      resources:
+        requests:
+          cpu: "100m"
+          memory: "128Mi"
+        limits:
+          cpu: "250m"
+          memory: "256Mi"
